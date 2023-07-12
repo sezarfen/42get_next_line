@@ -1,27 +1,27 @@
 #include "get_next_line.h"
 
-char	*move_forward(char *bigstr)
+char	*move_forward(char **bigstr)
 {
 	int		i;
 	int		j;
 	char	*newbig;
 
 	i = 0; // we can take as parameter with function call
-	while (bigstr[i] && bigstr[i] != '\n')
+	while ((*bigstr)[i] && (*bigstr)[i] != '\n')
 		i++;
-	if (bigstr[i] != '\n')
+	if ((*bigstr)[i] != '\n')
 		i++;
-	while (bigstr[i + j])
+	while ((*bigstr)[i + j])
 		j++;
 	newbig = malloc(sizeof(char) * (j + 1));
 	j = 0;
-	while (bigstr[i + j])
+	while ((*bigstr)[i + j])
 	{
-		newbig[j] = bigstr[i + j];
+		newbig[j] = (*bigstr)[i + j];
 		j++;
 	}
 	newbig[j] = '\0';
-	free(bigstr);
+	free((*bigstr));
 	return (newbig);
 }
 
@@ -122,7 +122,7 @@ char	*get_next_line(int fd)
 		free(temp);
 	}
 	temp = extract_newline(bigstr);
-	bigstr = move_forward(bigstr);
+	bigstr = move_forward(&bigstr);
 	return (temp);
 }
 
