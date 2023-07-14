@@ -5,7 +5,7 @@
 	göstermek amacıyla yazılmıştır.
 */
 // verilen BUFFER_SIZE kadar okuma yapacağız
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*go_forward(char *bigline, int i, int j)
 {
