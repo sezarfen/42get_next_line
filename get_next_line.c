@@ -1,10 +1,3 @@
-// static variable üzerinden gideceğize
-/*
-	Bu yazilar get_next_line projesini
-	anlamak ve nesıl bir yol izlendiğini
-	göstermek amacıyla yazılmıştır.
-*/
-// verilen BUFFER_SIZE kadar okuma yapacağız
 #include "get_next_line.h"
 
 char	*go_forward(char *bigline, int i, int j)
@@ -16,7 +9,7 @@ char	*go_forward(char *bigline, int i, int j)
 	if (bigline[i] == '\0')
 	{
 		free(bigline);
-		return (NULL); // daha ileri gitmeye gerek yok dosya bitmiş
+		return (NULL);
 	}
 	if (bigline[i] == '\n')
 		i++;
@@ -61,57 +54,47 @@ char	*extract_newline(char *bigline)
 	return (newline);
 }
 
-char	*add_to_bigline(char *bigline, char *buffer)
+char	*add_to_bigline(char *bigline, char *buffer, int i, int j)
 {
 	char	*newbig;
-	int		i;
-	int		j;
 
 	if (bigline == NULL)
 	{
 		bigline = malloc(sizeof(char) * 1);
-		bigline[0] = '\0'; // bigline = NULL olarak geliyse boş olarak başlatıyoruz
+		bigline[0] = '\0';
 	}
-
 	if (bigline == NULL || buffer == NULL)
 		return (NULL);
-
 	newbig = malloc(ft_strlen(bigline) + ft_strlen(buffer) + 1);
 	if (!newbig)
 		return (NULL);
-
-	i = 0;
 	while (bigline[i])
 	{
 		newbig[i] = bigline[i];
 		i++;
 	}
-
-	j = 0;
 	while (buffer[j])
 		newbig[i++] = buffer[j++];
 	newbig[i] = '\0';
-
 	free(bigline);
-
 	return (newbig);
+}
+
+char	*get_nest(char *bigline, char *newline)
+{
+	newline = extract_newline(bigline);
+	bigline = go_forward(bigline, 0, 0);
+	return (newline);
 }
 
 char	*get_next_line(int fd)
 {
 	static char	*bigline = NULL;
-	
 	char		*buffer;
-	
 	int			temp_read;
+	char		*newline;
 
-	char		*newline;  // bigline üzerinden alıp geri döndüreceğimiz eleman
-	
-	// buffer üzerine okumak , ve oradan bigline ' a ekleme yapmak
-	
-	// ta ki bigline içerisindeki string '\n' içerene kadar
-	
-	if (fd < 0 || BUFFER_SIZE <= 0) // fd ve BUFFER_SIZE kontrolü
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buffer)
@@ -123,14 +106,10 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	buffer[temp_read] = '\0';
-	bigline = add_to_bigline(bigline, buffer);
+	bigline = add_to_bigline(bigline, buffer, 0, 0);
 	free(buffer);
 	if (has_newline(bigline) || temp_read == 0)
-	{
-		newline = extract_newline(bigline); // zaten null ataması yapıyor
-		bigline = go_forward(bigline, 0, 0);
-		return (newline);
-	}
+		return (get_next(bigline, newline));
 	else
 		return (get_next_line(fd));
 }
