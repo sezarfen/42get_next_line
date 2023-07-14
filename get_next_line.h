@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 15
-#endif
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 15
+# endif
 
 size_t	ft_strlcpy(char *dest, char *src, size_t dsize);
 size_t	ft_strlen(char *str);
