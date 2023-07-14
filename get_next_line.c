@@ -116,10 +116,7 @@ char	*get_next_line(int fd)
 	
 	temp_read = read(fd, buffer, BUFFER_SIZE);
 	if (temp_read == -1)
-	{
-		free(bigline);
 		return (NULL);
-	}
 	buffer[temp_read] = '\0';
 	
 	bigline = add_to_bigline(bigline, buffer);
