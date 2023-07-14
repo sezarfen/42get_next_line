@@ -110,7 +110,7 @@ char	*get_next_line(int fd)
 	free(buffer);
 	newline = NULL;
 	if (has_newline(bigline) || temp_read == 0)
-		return (get_next(&bigline, &newline));
+		return (get_nest(&bigline, &newline));
 	else
 		return (get_next_line(fd));
 }
