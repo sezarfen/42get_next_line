@@ -80,11 +80,11 @@ char	*add_to_bigline(char *bigline, char *buffer, int i, int j)
 	return (newbig);
 }
 
-char	*get_nest(char *bigline, char *newline)
+char	*get_nest(char **bigline, char **newline)
 {
-	newline = extract_newline(bigline);
-	bigline = go_forward(bigline, 0, 0);
-	return (newline);
+	*newline = extract_newline(*bigline);
+	*bigline = go_forward(*bigline, 0, 0);
+	return (*newline);
 }
 
 char	*get_next_line(int fd)
@@ -108,8 +108,9 @@ char	*get_next_line(int fd)
 	buffer[temp_read] = '\0';
 	bigline = add_to_bigline(bigline, buffer, 0, 0);
 	free(buffer);
+	newline = NULL;
 	if (has_newline(bigline) || temp_read == 0)
-		return (get_next(bigline, newline));
+		return (get_next(&bigline, &newline));
 	else
 		return (get_next_line(fd));
 }
