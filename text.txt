@@ -1,3 +1,3 @@
-Selamun Aleyküm herkese selam arkadaslar
-nasılsınız umarım iyisinizdir,
-Allah bizlerin hidayetini arttırsın ve hidayet versin.
+Bu yazilar get_next_line projesini
+anlamak ve nasil bir yol izlendiğini
+göstermek amacıyla yazılmıştır.

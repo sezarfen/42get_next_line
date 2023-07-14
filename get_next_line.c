@@ -1,137 +1,134 @@
+// static variable üzerinden gideceğize
+/*
+	Bu yazilar get_next_line projesini
+	anlamak ve nesıl bir yol izlendiğini
+	göstermek amacıyla yazılmıştır.
+*/
+// verilen BUFFER_SIZE kadar okuma yapacağız
 #include "get_next_line.h"
 
-char	*move_forward(char **bigstr)
+char	*go_forward(char *bigline, int i, int j)
 {
-	int		i;
-	int		j;
 	char	*newbig;
 
-	i = 0; // we can take as parameter with function call
-	while ((*bigstr)[i] && (*bigstr)[i] != '\n')
+	while (bigline[i] && bigline[i] != '\n')
 		i++;
-	if ((*bigstr)[i] != '\n')
-		i++;
-	while ((*bigstr)[i + j])
-		j++;
-	newbig = malloc(sizeof(char) * (j + 1));
-	j = 0;
-	while ((*bigstr)[i + j])
+	if (bigline[i] == '\0')
 	{
-		newbig[j] = (*bigstr)[i + j];
+		free(bigline);
+		return (NULL); // daha ileri gitmeye gerek yok dosya bitmiş
+	}
+	if (bigline[i] == '\n')
+		i++;
+	newbig = malloc(ft_strlen(bigline) - i + 1);
+	if (!newbig)
+		return (NULL);
+	j = 0;
+	while (bigline[i + j])
+	{
+		newbig[j] = bigline[i + j];
 		j++;
 	}
 	newbig[j] = '\0';
-	free((*bigstr));
+	free(bigline);
 	return (newbig);
 }
 
-char	*extract_newline(char *bigstr)
+char	*extract_newline(char *bigline)
 {
-	int		i;
 	char	*newline;
+	int		i;
 
+	if (!bigline || bigline[0] == '\0')
+		return (NULL);
 	i = 0;
-	while (bigstr[i] && bigstr[i] != '\n')
+	while (bigline[i] && bigline[i] != '\n')
 		i++;
-	if (bigstr[i] == '\n')
+	if (bigline[i] == '\n')
 		i++;
 	newline = malloc(sizeof(char) * (i + 1));
 	if (!newline)
 		return (NULL);
 	i = 0;
-	while (bigstr[i] && bigstr[i] != '\n')
+	while (bigline[i] && bigline[i] != '\n')
 	{
-		newline[i] = bigstr[i];
+		newline[i] = bigline[i];
 		i++;
 	}
-	if (bigstr[i] == '\n')
+	if (bigline[i] == '\n')
 		newline[i++] = '\n';
 	newline[i] = '\0';
 	return (newline);
 }
 
-int	ft_strlen(char *str)
+char	*add_to_bigline(char *bigline, char *buffer)
 {
-	int	i;
+	char	*newbig;
+	int		i;
+	int		j;
 
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-char 	*ft_strjoin(char *s1, char *s2, int i, int j) // i and j will be initialized with 0
-{
-	char	*old;
-	char	*to_return;
-
-	if (!s1 || !s2)
-		return (NULL);
-	old = s1;
-	to_return = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!to_return)
-		return (NULL);
-	while (s1[i])
-		to_return[j++] = s1[i++];
-	i = 0;
-	while (s2[i])
-		to_return[j++] = s2[i++];
-	to_return[j] = '\0';
-	//free(old);
-	return (to_return);
-}
-
-int	ft_indexof(char *str, char c)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
+	if (bigline == NULL)
 	{
-		if (str[i] == c)
-			return (i);
+		bigline = malloc(sizeof(char) * 1);
+		bigline[0] = '\0'; // bigline = NULL olarak geliyse boş olarak başlatıyoruz
+	}
+
+	if (bigline == NULL || buffer == NULL)
+		return (NULL);
+
+	newbig = malloc(ft_strlen(bigline) + ft_strlen(buffer) + 1);
+	if (!newbig)
+		return (NULL);
+
+	i = 0;
+	while (bigline[i])
+	{
+		newbig[i] = bigline[i];
 		i++;
 	}
-	return (-1); // c didn't occured
+
+	j = 0;
+	while (buffer[j])
+		newbig[i++] = buffer[j++];
+
+	newbig[i] = '\0';
+	free(bigline);
+
+	return (newbig);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*bigstr = "\0";
-	char		*temp;
-	int			readed;
+	static char	*bigline = NULL;
+	
+	char		buffer[BUFFER_SIZE + 1];
+	
+	int			temp_read;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, &temp, 0))
+	char		*newline;  // bigline üzerinden alıp geri döndüreceğimiz eleman
+	
+	// buffer üzerine okumak , ve oradan bigline ' a ekleme yapmak
+	
+	// ta ki bigline içerisindeki string '\n' içerene kadar
+	
+	if (fd < 0 || BUFFER_SIZE <= 0) // fd ve BUFFER_SIZE kontrolü
 		return (NULL);
-	readed = 1;
-	printf("p0\n");
-	while (ft_indexof(bigstr, '\n') == -1 && readed > 0)
+	
+	temp_read = read(fd, buffer, BUFFER_SIZE);
+	if (temp_read == -1)
 	{
-		printf("p1\n");
-		temp = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-		if (!temp)
-		{
-			free(bigstr);
-			return (NULL);
-		}
-		readed = read(fd, temp, BUFFER_SIZE);
-		temp[readed] = '\0';
-		printf("p2\n");
-		bigstr = ft_strjoin(bigstr, temp, 0, 0);
-		printf("p3\n");
-		free(temp);
+		free(bigline);
+		return (NULL);
 	}
-	temp = extract_newline(bigstr);
-	bigstr = move_forward(&bigstr);
-	return (temp);
-}
-
-int main(void)
-{
-	int fd = open("text.txt", O_RDONLY);
-	printf("fd -> %d\n", fd);
-	char	*str = get_next_line(fd);
-	printf("first line -> %s", str);
-	free(str);
-	return (0);
+	buffer[temp_read] = '\0';
+	
+	bigline = add_to_bigline(bigline, buffer);
+	if (has_newline(bigline) || temp_read == 0)
+	{
+		newline = extract_newline(bigline); // zaten null ataması yapıyor
+		bigline = go_forward(bigline, 0, 0);
+		return (newline);
+	}
+	else
+		return (get_next_line(fd));
 }
