@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fdundar <42istanbul.com.tr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/07/15 10:29:51 by fdundar           #+#    #+#             */
+/*   Updated: 2023/07/15 10:29:52 by fdundar          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line_bonus.h"
 
 char	*go_forward(char *bigline, int i, int j)
@@ -89,10 +101,9 @@ char	*get_nest(char **bigline, char **newline)
 
 char	*get_next_line(int fd)
 {
-	static char	*bigline = NULL;
+	static char	*bigline[OPEN_MAX];
 	char		*buffer;
 	int			temp_read;
-	char		*newline;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
@@ -102,15 +113,16 @@ char	*get_next_line(int fd)
 	temp_read = read(fd, buffer, BUFFER_SIZE);
 	if (temp_read == -1)
 	{
+		free(bigline[fd]);
+		bigline[fd] = NULL;
 		free(buffer);
 		return (NULL);
 	}
 	buffer[temp_read] = '\0';
-	bigline = add_to_bigline(bigline, buffer, 0, 0);
+	bigline[fd] = add_to_bigline(bigline[fd], buffer, 0, 0);
 	free(buffer);
-	newline = NULL;
-	if (has_newline(bigline) || temp_read == 0)
-		return (get_nest(&bigline, &newline));
+	if (has_newline(bigline[fd]) || temp_read == 0)
+		return (get_nest(&(bigline[fd]), &buffer));
 	else
 		return (get_next_line(fd));
 }
